@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web-app-config
+  labels:
+    app: web-app
+data:
+  APP_ENV: "staging"
+  LOG_LEVEL: "info"
+  MAX_CONNECTIONS: "100"
+  nginx.conf: |
+    server {
+      listen 80;
+      location / {
+        return 200 "Config loaded from ConfigMap\n";
+      }
+    }
