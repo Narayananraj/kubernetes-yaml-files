@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app-spread
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web-app-spread
+  template:
+    metadata:
+      labels:
+        app: web-app-spread
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values: ["web-app-spread"]
+              topologyKey: kubernetes.io/hostname
+      containers:
+        - name: nginx
+          image: nginx:1.27-alpine
+          resources:
+            requests: { cpu: "50m", memory: "32Mi" }
+            limits: { cpu: "100m", memory: "64Mi" }
