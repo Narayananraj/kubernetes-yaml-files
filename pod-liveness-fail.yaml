@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: liveness-fail-demo
+  labels:
+    app: liveness-fail-demo
+spec:
+  containers:
+    - name: app
+      image: busybox:1.36
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          touch /tmp/healthy
+          sleep 30
+          rm -f /tmp/healthy
+          sleep 3600
+      livenessProbe:
+        exec:
+          command: ["cat", "/tmp/healthy"]
+        periodSeconds: 5
+        failureThreshold: 2
+      resources:
+        requests: { cpu: "20m", memory: "16Mi" }
+        limits: { cpu: "50m", memory: "32Mi" }
