@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: api-backend }
+  template:
+    metadata:
+      labels: { app: api-backend }
+    spec:
+      containers:
+        - name: app
+          image: hashicorp/http-echo:1.0
+          args: ["-text=response from api-backend", "-listen=:5678"]
+          ports: [{ containerPort: 5678 }]
+          resources:
+            requests: { cpu: "20m", memory: "16Mi" }
+            limits: { cpu: "50m", memory: "32Mi" }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-backend-svc
+spec:
+  selector: { app: api-backend }
+  ports: [{ port: 80, targetPort: 5678 }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: web-backend }
+  template:
+    metadata:
+      labels: { app: web-backend }
+    spec:
+      containers:
+        - name: app
+          image: hashicorp/http-echo:1.0
+          args: ["-text=response from web-backend", "-listen=:5678"]
+          ports: [{ containerPort: 5678 }]
+          resources:
+            requests: { cpu: "20m", memory: "16Mi" }
+            limits: { cpu: "50m", memory: "32Mi" }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-backend-svc
+spec:
+  selector: { app: web-backend }
+  ports: [{ port: 80, targetPort: 5678 }]
